@@ -1,56 +1,64 @@
 export async function handler(event) {
   try {
 
-    const { image } = JSON.parse(event.body);
-    const API_KEY = process.env.GEMINI_API_KEY;
-
-    if (!image) {
+    if (!event.body) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "No image provided" })
+        body: JSON.stringify({ error: "Missing body" })
       };
     }
+
+    const body = JSON.parse(event.body);
+
+    if (!body.image) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "No image received" })
+      };
+    }
+
+    const API_KEY = process.env.GEMINI_API_KEY;
+
+    if (!API_KEY) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Missing API key" })
+      };
+    }
+
+    const base64 = body.image.split(",")[1];
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [
             {
               parts: [
                 {
                   text: `
-text: `
 Sei un esperto ottico.
 
-PRIMA:
-Descrivi esattamente cosa vedi nell'immagine (numeri, scritte, valori).
+Descrivi prima cosa vedi nell'immagine.
+Poi estrai i dati della prescrizione.
 
-POI:
-Estrai i dati della prescrizione.
-
-REGOLE:
-- NON inventare
-- Se non leggi → null
-- Usa SOLO la riga "Lontano"
+NON inventare dati.
 
 Formato JSON:
-
 {
   "od": { "sph": number, "cyl": number, "axis": number },
   "os": { "sph": number, "cyl": number, "axis": number },
   "add": number,
   "pd": number
 }
-`                },
+`
+                },
                 {
                   inline_data: {
                     mime_type: "image/jpeg",
-                    data: image.split(",")[1]
+                    data: base64
                   }
                 }
               ]
@@ -62,13 +70,18 @@ Formato JSON:
 
     const data = await response.json();
 
-    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    console.log("GEMINI RAW:", JSON.stringify(data));
 
-    // pulizia output (rimuove eventuali ```json)
-    text = text
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
+    let text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!text) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Empty AI response", raw: data })
+      };
+    }
+
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
 
     return {
       statusCode: 200,
@@ -79,7 +92,8 @@ Formato JSON:
     return {
       statusCode: 500,
       body: JSON.stringify({
-        error: error.message
+        error: error.message,
+        stack: error.stack
       })
     };
   }
