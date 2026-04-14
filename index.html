@@ -127,7 +127,7 @@ button {
 
 <div class="container">
 
-<h2>Configuratore Lenti v2.45</h2>
+<h2>Configuratore Lenti v2.5</h2>
 
 <div class="card">
 <h3>Prescrizione</h3>
@@ -343,33 +343,58 @@ function generaSpiegazione(opt, params, r) {
 
 function scegliLenteMigliore(params, r) {
 
-  let score = Math.abs(r.se);
+  const se = Math.abs(r.se);
+
+  const cylOD = Math.abs(params.od_cyl);
+  const cylOS = Math.abs(params.os_cyl);
+  const maxCyl = Math.max(cylOD, cylOS);
 
   let index = 1.5;
   let design = "Standard";
   let tag = "economica";
 
-  if (score > 2) {
+  let upgradeReason = null; // 👈 NUOVO
+
+  // BASE
+  if (se > 2) {
     index = 1.6;
     design = "Asferico";
     tag = "consigliata";
   }
 
-  if (score > 4) {
+  if (se > 4) {
     index = 1.67;
     design = "Atorico";
     tag = "premium";
   }
 
-  if (score > 6 || r.mbs > 65) {
+  if (se > 6 || r.mbs > 65) {
     index = 1.74;
     design = "Freeform";
     tag = "top";
   }
 
-  return { index, design, tag };
-}
+  // ASTIGMATISMO → FORZA DESIGN
+  if (maxCyl >= 1.5 && design === "Standard") {
+    design = "Asferico";
+    tag = "consigliata";
+    upgradeReason = "astigmatismo";
+  }
 
+  if (maxCyl >= 2.5) {
+    design = "Atorico";
+    tag = "premium";
+    upgradeReason = "astigmatismo elevato";
+  }
+
+  if (maxCyl >= 3.5) {
+    design = "Freeform";
+    tag = "top";
+    upgradeReason = "astigmatismo molto elevato";
+  }
+
+  return { index, design, tag, upgradeReason };
+}
 
 function shortDesc(text) {
   return text.split(",")[0];
@@ -422,12 +447,25 @@ function mostraOpzione(){
   });
 
   // 👉 POI UI
-  document.getElementById("optionLabel").innerHTML =
-    opt.design + " - " + opt.index +
-    " <span class='badge'>" + opt.tag + "</span>" +
-    "<div style='font-size:12px;color:#555;margin-top:6px;'>" +
-    generaSpiegazione(opt, lastParams, r) +
-    "</div>";
+  let extra = "";
+
+// 👉 lente migliore
+if (window.bestReason && currentIndex === window.bestIndex) {
+  extra = "<div style='color:#2e7d32;font-size:11px;margin-top:6px;'>✔ Scelta ottimizzata per " + window.bestReason + ".</div>";
+}
+
+// 👉 lente NON ottimale
+if (currentIndex !== window.bestIndex) {
+  extra += "<div style='color:#d32f2f;font-size:11px;margin-top:6px;'>⚠ Non è la soluzione ottimale per questo caso.</div>";
+}
+
+document.getElementById("optionLabel").innerHTML =
+  opt.design + " - " + opt.index +
+  " <span class='badge'>" + opt.tag + "</span>" +
+  "<div style='font-size:12px;color:#555;margin-top:6px;'>" +
+  generaSpiegazione(opt, lastParams, r) +
+  "</div>" +
+  extra;
 
   document.getElementById("result").innerHTML =
     "SE: " + r.se + "<br>" +
@@ -472,6 +510,8 @@ function calcola(){
 
 const best = scegliLenteMigliore(lastParams, baseResult);
 
+window.bestReason = best.upgradeReason; // 👈 salva globale
+
 options = generaOpzioni();
 
 // trova indice della lente migliore
@@ -481,6 +521,9 @@ currentIndex = options.findIndex(o =>
 
 // fallback sicurezza
 if (currentIndex === -1) currentIndex = 1;
+
+window.bestIndex = currentIndex; // 👈 NUOVO
+
 
   document.getElementById("selector").style.display="flex";
 
