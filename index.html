@@ -91,7 +91,7 @@ button {
 
 <div class="container">
 
-<h2>Configuratore Lenti v2.3</h2>
+<h2>Configuratore Lenti v2.4</h2>
 
 <div class="card">
 <h3>Prescrizione</h3>
@@ -271,31 +271,51 @@ function generaOpzioni(){
     }
   ];
 }
+
+function generaSpiegazione(opt, params, r) {
+
+  let testo = opt.desc;
+
+  if (Math.abs(r.se) > 4) {
+    testo += " In questo caso specifico, è utile ridurre lo spessore della lente.";
+  }
+
+  if (r.mbs > 65) {
+    testo += " Il diametro elevato rende importante scegliere un indice più sottile.";
+  }
+
+  if (params.A > 55) {
+    testo += " La montatura ampia aumenta lo spessore periferico.";
+  }
+
+  return testo;
+}
 function mostraOpzione(){
-  const opt=options[currentIndex];
+  const opt = options[currentIndex];
 
-  document.getElementById("optionLabel").innerHTML =
-  opt.design+" - "+opt.index+
-  " <span class='badge'>"+opt.tag+"</span>" +
-  "<div style='font-size:12px;color:#555;margin-top:6px;'>" +
-  opt.desc +
-  "</div>";
-
+  // 👉 PRIMA calcolo
   const r = lensEngine({
     ...lastParams,
-    forcedIndex:opt.index,
-    forcedDesign:opt.design
+    forcedIndex: opt.index,
+    forcedDesign: opt.design
   });
 
-  document.getElementById("result").innerHTML =
-    "SE: "+r.se+"<br>"+
-    "Decentramento: "+r.decentration+" mm<br>"+
-    "Diametro: "+r.mbs+" mm<br>"+
-    "Design: "+opt.design+"<br>"+
-    "Indice: "+opt.index+"<br>"+
-    "Spessore: "+r.edgeThickness+" mm";
-}
+  // 👉 POI UI
+  document.getElementById("optionLabel").innerHTML =
+    opt.design + " - " + opt.index +
+    " <span class='badge'>" + opt.tag + "</span>" +
+    "<div style='font-size:12px;color:#555;margin-top:6px;'>" +
+    generaSpiegazione(opt, lastParams, r) +
+    "</div>";
 
+  document.getElementById("result").innerHTML =
+    "SE: " + r.se + "<br>" +
+    "Decentramento: " + r.decentration + " mm<br>" +
+    "Diametro: " + r.mbs + " mm<br>" +
+    "Design: " + opt.design + "<br>" +
+    "Indice: " + opt.index + "<br>" +
+    "Spessore: " + r.edgeThickness + " mm";
+}
 function nextOption(){
   currentIndex=(currentIndex+1)%options.length;
   mostraOpzione();
