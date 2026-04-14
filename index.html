@@ -7,9 +7,8 @@
 
 <style>
 body {
-  font-family: Arial, sans-serif;
+  font-family: Arial;
   background: #f5f7fa;
-  margin: 0;
   padding: 15px;
 }
 
@@ -18,64 +17,72 @@ body {
   margin: auto;
 }
 
-h2 {
-  text-align: center;
-}
-
 .card {
   background: white;
   padding: 15px;
   margin-top: 15px;
   border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.grid-4 {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-label {
-  font-size: 12px;
-  color: #666;
-}
+.grid { display: grid; grid-template-columns: repeat(3,1fr); gap:10px;}
+.grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap:10px;}
 
 input {
-  width: 100%;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  width:100%;
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #ccc;
 }
 
 button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 15px;
-  border: none;
-  border-radius: 8px;
-  background: #1976d2;
-  color: white;
-  cursor: pointer;
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  background:#1976d2;
+  color:white;
+  border:none;
+  border-radius:8px;
 }
 
 #result {
-  margin-top: 15px;
-  padding: 15px;
-  background: #e3f2fd;
-  border-radius: 8px;
+  margin-top:15px;
+  background:#e3f2fd;
+  padding:15px;
+  border-radius:8px;
 }
 
-@media (max-width: 600px) {
-  .grid, .grid-4 {
-    grid-template-columns: 1fr 1fr;
-  }
+/* SELECTOR */
+.selector {
+  display:none;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin-top:15px;
+}
+
+.arrow {
+  width:40px;
+  height:40px;
+  background:#1976d2;
+  color:white;
+  border:none;
+  border-radius:6px;
+}
+
+.option-box {
+  background:white;
+  padding:10px;
+  border-radius:8px;
+  font-weight:bold;
+}
+
+.badge {
+  background:#1976d2;
+  color:white;
+  font-size:11px;
+  padding:2px 6px;
+  border-radius:5px;
+  margin-left:6px;
 }
 </style>
 </head>
@@ -84,74 +91,113 @@ button {
 
 <div class="container">
 
-<h2>Configuratore Lenti v1.2</h2>
+<h2>Configuratore Lenti v2.0</h2>
 
-<!-- PRESCRIZIONE -->
 <div class="card">
-  <h3>Prescrizione</h3>
-  <div class="grid">
-    <div><label>OD SPH (Sfera)</label><input type="number" step="0.25" id="od_sph"></div>
-    <div><label>CYL (Cilindro)</label><input type="number" step="0.25" id="od_cyl"></div>
-    <div><label>AX (Asse)</label><input type="number" step="1" id="od_axis"></div>
+<h3>Prescrizione</h3>
+<div class="grid">
+<input type="number" step="0.25" id="od_sph" placeholder="OD SPH">
+<input type="number" step="0.25" id="od_cyl" placeholder="CYL">
+<input type="number" step="1" id="od_axis" placeholder="AX">
 
-    <div><label>OS SPH (Sfera)</label><input type="number" step="0.25" id="os_sph"></div>
-    <div><label>CYL (Cilindro)</label><input type="number" step="0.25" id="os_cyl"></div>
-    <div><label>AX (Asse)</label><input type="number" step="1" id="os_axis"></div>
-  </div>
+<input type="number" step="0.25" id="os_sph" placeholder="OS SPH">
+<input type="number" step="0.25" id="os_cyl" placeholder="CYL">
+<input type="number" step="1" id="os_axis" placeholder="AX">
+</div>
 </div>
 
-<!-- PARAMETRI -->
 <div class="card">
-  <h3>Parametri</h3>
-  <div class="grid">
-    <div><label>ADD (Addizione)</label><input type="number" step="0.25" id="add"></div>
-    <div><label>Prisma</label><input type="number" step="0.25" id="prism"></div>
-  </div>
+<h3>Parametri</h3>
+<div class="grid">
+<input type="number" step="0.25" id="add" placeholder="ADD">
+<input type="number" step="0.25" id="prism" placeholder="Prisma">
+</div>
 </div>
 
-<!-- MONTATURA -->
 <div class="card">
-  <h3>Montatura</h3>
-  <div class="grid-4">
-    <div>
-      <label>A (Calibro orizzontale lente)</label>
-      <input type="number" step="1" id="frame_a">
-    </div>
-
-    <div>
-      <label>DBL (Distanza tra le lenti / ponte)</label>
-      <input type="number" step="1" id="frame_dbl">
-    </div>
-
-    <div>
-      <label>PD (Distanza interpupillare)</label>
-      <input type="number" step="1" id="pd">
-    </div>
-
-    <div>
-      <label>H (Altezza montaggio)</label>
-      <input type="number" step="1" id="height">
-    </div>
-  </div>
+<h3>Montatura</h3>
+<div class="grid-4">
+<input type="number" id="frame_a" placeholder="A (calibro)">
+<input type="number" id="frame_dbl" placeholder="DBL (ponte)">
+<input type="number" id="pd" placeholder="PD">
+<input type="number" id="height" placeholder="H (altezza)">
+</div>
 </div>
 
 <button onclick="calcola()">Calcola</button>
 
 <div id="result"></div>
 
+<!-- 🔥 SELETTORE LENTE -->
+<div class="selector" id="selector">
+<button class="arrow" onclick="prevOption()">&lt;</button>
+
+<div class="option-box">
+<span id="optionLabel"></span>
 </div>
 
-<script src="lensEngine.js?v=2"></script>
+<button class="arrow" onclick="nextOption()">&gt;</button>
+</div>
+
+</div>
+
+<script src="lensEngine.js?v=3"></script>
 
 <script>
-function val(id) {
-  const v = parseFloat(document.getElementById(id).value);
-  return isNaN(v) ? 0 : v;
+
+let options = [];
+let currentIndex = 0;
+let lastParams = {};
+
+function val(id){
+  const v=parseFloat(document.getElementById(id).value);
+  return isNaN(v)?0:v;
 }
 
-function calcola() {
+function generaOpzioni(){
+  return [
+    {index:1.5, design:"Standard", tag:"economica"},
+    {index:1.6, design:"Asferico", tag:"consigliata"},
+    {index:1.67, design:"Atorico", tag:"premium"},
+    {index:1.74, design:"Freeform", tag:"top"}
+  ];
+}
 
-  const params = {
+function mostraOpzione(){
+  const opt=options[currentIndex];
+
+  document.getElementById("optionLabel").innerHTML =
+    opt.design+" - "+opt.index+
+    " <span class='badge'>"+opt.tag+"</span>";
+
+  const r = lensEngine({
+    ...lastParams,
+    forcedIndex:opt.index,
+    forcedDesign:opt.design
+  });
+
+  document.getElementById("result").innerHTML =
+    "SE: "+r.se+"<br>"+
+    "Decentramento: "+r.decentration+" mm<br>"+
+    "Diametro: "+r.mbs+" mm<br>"+
+    "Design: "+opt.design+"<br>"+
+    "Indice: "+opt.index+"<br>"+
+    "Spessore: "+r.edgeThickness+" mm";
+}
+
+function nextOption(){
+  currentIndex=(currentIndex+1)%options.length;
+  mostraOpzione();
+}
+
+function prevOption(){
+  currentIndex=(currentIndex-1+options.length)%options.length;
+  mostraOpzione();
+}
+
+function calcola(){
+
+  lastParams = {
     od_sph: val("od_sph"),
     od_cyl: val("od_cyl"),
     od_axis: val("od_axis"),
@@ -166,16 +212,14 @@ function calcola() {
     height: val("height")
   };
 
-  const r = lensEngine(params);
+  options = generaOpzioni();
+  currentIndex = 1; // consigliata
 
-  document.getElementById("result").innerHTML =
-    "SE: " + r.se + "<br>" +
-    "Decentramento: " + r.decentration + " mm<br>" +
-    "Diametro: " + r.mbs + " mm<br>" +
-    "Design: " + r.design + "<br>" +
-    "Indice: " + r.index + "<br>" +
-    "Spessore: " + r.edgeThickness + " mm";
+  document.getElementById("selector").style.display="flex";
+
+  mostraOpzione();
 }
+
 </script>
 
 </body>
