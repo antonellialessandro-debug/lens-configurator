@@ -91,7 +91,7 @@ button {
 
 <div class="container">
 
-<h2>Configuratore Lenti v2.0</h2>
+<h2>Configuratore Lenti v2.3</h2>
 
 <div class="card">
 <h3>Prescrizione</h3>
@@ -207,6 +207,14 @@ const labels = {
 };
 
 function setPlaceholders() {
+  const t = labels[lang];
+
+  Object.keys(t).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.placeholder = t[id];
+  });
+}
+
 function setLabels() {
   const t = labels[lang];
 
@@ -223,17 +231,8 @@ function setLabels() {
     const el = document.getElementById(id);
     if (el) el.innerText = map[id];
   }
-}  
-
-const t = labels[lang];
-
-  Object.keys(t).forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.placeholder = t[id];
-  });
 }
 
-// 👉 esegui dopo caricamento pagina
 window.onload = () => {
   setPlaceholders();
   setLabels();
