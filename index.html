@@ -76,6 +76,7 @@ button:hover {
   border-radius: 8px;
 }
 
+/* 🔥 NUOVO SELECTOR */
 .selector {
   display: none;
   justify-content: center;
@@ -106,11 +107,7 @@ button:hover {
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   font-weight: bold;
-}
-.selector button {
-  width: auto;
-  padding: 8px 12px;
-  margin: 0 10px;
+  text-align: center;
 }
 
 .badge {
@@ -172,6 +169,7 @@ button:hover {
 
 <div id="result"></div>
 
+<!-- 🔥 SELECTOR MIGLIORATO -->
 <div class="selector" id="selector">
   <button class="arrow" onclick="prevOption()">⬅</button>
 
@@ -181,12 +179,13 @@ button:hover {
 
   <button class="arrow" onclick="nextOption()">➡</button>
 </div>
+
 </div>
 
 <script src="lensEngine.js"></script>
 
 <script>
-/* --------- MULTILINGUA PLACEHOLDER --------- */
+/* --------- MULTILINGUA --------- */
 const lang = navigator.language.startsWith("it") ? "it" : "en";
 
 const labels = {
@@ -230,7 +229,7 @@ function setPlaceholders() {
 
 window.onload = setPlaceholders;
 
-/* --------- LOGICA BASE --------- */
+/* --------- LOGICA --------- */
 let options = [];
 let currentIndex = 0;
 let lastParams = {};
@@ -242,7 +241,6 @@ function val(id) {
   return isNaN(v) ? 0 : v;
 }
 
-/* --------- OPZIONI LENTE --------- */
 function generaOpzioni() {
   return [
     { index: 1.5, design: "Standard", tag: "economica" },
@@ -252,13 +250,14 @@ function generaOpzioni() {
   ];
 }
 
-/* --------- UI --------- */
 function mostraOpzione() {
   const opt = options[currentIndex];
 
   document.getElementById("optionLabel").innerHTML =
     opt.design + " - " + opt.index +
-    ' <span class="badge">' + opt.tag + '</span>';
+    '<div style="font-size:11px;color:#666;margin-top:4px;">' +
+    opt.tag +
+    '</div>';
 
   const r = lensEngine({
     ...lastParams,
@@ -285,7 +284,6 @@ function prevOption() {
   mostraOpzione();
 }
 
-/* --------- CALCOLO --------- */
 function calcola() {
   const params = {
     od_sph: val("od_sph"),
@@ -306,7 +304,7 @@ function calcola() {
 
   options = generaOpzioni();
 
-  currentIndex = 1; // default consigliata
+  currentIndex = 1;
 
   const sel = document.getElementById("selector");
   if (sel) sel.style.display = "flex";
