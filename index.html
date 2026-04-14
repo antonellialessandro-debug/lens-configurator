@@ -78,7 +78,8 @@ button:hover {
 
 .selector {
   display: none;
-  text-align: center;
+  justify-content: center;
+  align-items: center;
   margin-top: 15px;
 }
 
@@ -115,31 +116,31 @@ button:hover {
 <div class="card">
   <h3>Prescrizione</h3>
   <div class="grid">
-    <div><label>OD SPH</label><input id="od_sph" placeholder="-2.50"></div>
-    <div><label>CYL</label><input id="od_cyl" placeholder="-1.00"></div>
-    <div><label>AX</label><input id="od_axis" placeholder="90"></div>
+    <div><label>OD</label><input id="od_sph"></div>
+    <div><label>CYL</label><input id="od_cyl"></div>
+    <div><label>AX</label><input id="od_axis"></div>
 
-    <div><label>OS SPH</label><input id="os_sph" placeholder="-2.50"></div>
-    <div><label>CYL</label><input id="os_cyl" placeholder="-1.00"></div>
-    <div><label>AX</label><input id="os_axis" placeholder="90"></div>
+    <div><label>OS</label><input id="os_sph"></div>
+    <div><label>CYL</label><input id="os_cyl"></div>
+    <div><label>AX</label><input id="os_axis"></div>
   </div>
 </div>
 
 <div class="card">
   <h3>Parametri</h3>
   <div class="grid">
-    <div><label>ADD</label><input id="add" placeholder="1.50"></div>
-    <div><label>Prisma</label><input id="prism" placeholder="0.00"></div>
+    <div><label>ADD</label><input id="add"></div>
+    <div><label>Prisma</label><input id="prism"></div>
   </div>
 </div>
 
 <div class="card">
   <h3>Montatura</h3>
   <div class="grid-4">
-    <div><label>A</label><input id="frame_a" placeholder="52"></div>
-    <div><label>DBL</label><input id="frame_dbl" placeholder="18"></div>
-    <div><label>PD</label><input id="pd" placeholder="62"></div>
-    <div><label>Altezza</label><input id="height" placeholder="22"></div>
+    <div><label>A</label><input id="frame_a"></div>
+    <div><label>DBL</label><input id="frame_dbl"></div>
+    <div><label>PD</label><input id="pd"></div>
+    <div><label>H</label><input id="height"></div>
   </div>
 </div>
 
@@ -158,6 +159,51 @@ button:hover {
 <script src="lensEngine.js"></script>
 
 <script>
+/* --------- MULTILINGUA PLACEHOLDER --------- */
+const lang = navigator.language.startsWith("it") ? "it" : "en";
+
+const labels = {
+  it: {
+    sph: "Sfera",
+    cyl: "Cilindro",
+    axis: "Asse",
+    add: "Addizione",
+    prism: "Prisma",
+    pd: "Distanza interpupillare",
+    height: "Altezza montaggio"
+  },
+  en: {
+    sph: "Sphere",
+    cyl: "Cylinder",
+    axis: "Axis",
+    add: "Addition",
+    prism: "Prism",
+    pd: "Pupillary distance",
+    height: "Fitting height"
+  }
+};
+
+function setPlaceholders() {
+  const t = labels[lang];
+
+  document.getElementById("od_sph").placeholder = t.sph;
+  document.getElementById("od_cyl").placeholder = t.cyl;
+  document.getElementById("od_axis").placeholder = t.axis;
+
+  document.getElementById("os_sph").placeholder = t.sph;
+  document.getElementById("os_cyl").placeholder = t.cyl;
+  document.getElementById("os_axis").placeholder = t.axis;
+
+  document.getElementById("add").placeholder = t.add;
+  document.getElementById("prism").placeholder = t.prism;
+
+  document.getElementById("pd").placeholder = t.pd;
+  document.getElementById("height").placeholder = t.height;
+}
+
+window.onload = setPlaceholders;
+
+/* --------- LOGICA BASE --------- */
 let options = [];
 let currentIndex = 0;
 let lastParams = {};
@@ -169,20 +215,22 @@ function val(id) {
   return isNaN(v) ? 0 : v;
 }
 
-function generaOpzioni(params) {
+/* --------- OPZIONI LENTE --------- */
+function generaOpzioni() {
   return [
     { index: 1.5, design: "Standard", tag: "economica" },
     { index: 1.6, design: "Asferico", tag: "consigliata" },
     { index: 1.67, design: "Atorico", tag: "premium" },
-    { index: 1.74, design: "Freeform", tag: "ultra" }
+    { index: 1.74, design: "Freeform", tag: "top" }
   ];
 }
 
+/* --------- UI --------- */
 function mostraOpzione() {
   const opt = options[currentIndex];
 
   document.getElementById("optionLabel").innerHTML =
-    opt.design + " - indice " + opt.index +
+    opt.design + " - " + opt.index +
     ' <span class="badge">' + opt.tag + '</span>';
 
   const r = lensEngine({
@@ -210,6 +258,7 @@ function prevOption() {
   mostraOpzione();
 }
 
+/* --------- CALCOLO --------- */
 function calcola() {
   const params = {
     od_sph: val("od_sph"),
@@ -228,11 +277,12 @@ function calcola() {
 
   lastParams = params;
 
-  options = generaOpzioni(params);
+  options = generaOpzioni();
 
-  currentIndex = 1; // consigliata
+  currentIndex = 1; // default consigliata
 
-  document.getElementById("selector").style.display = "block";
+  const sel = document.getElementById("selector");
+  if (sel) sel.style.display = "flex";
 
   mostraOpzione();
 }
