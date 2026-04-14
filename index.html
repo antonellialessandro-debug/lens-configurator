@@ -1,80 +1,176 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Configuratore Lenti</title>
+<meta charset="UTF-8">
+<title>Configuratore Lenti</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      padding: 20px;
-      max-width: 800px;
-      margin: auto;
-    }
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+  }
 
-    input {
-      margin: 5px 0;
-      padding: 5px;
-      width: 100%;
-    }
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
 
-    button {
-      margin-top: 15px;
-      padding: 12px;
-      width: 100%;
-      background: #1976d2;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+  h3 {
+    margin-top: 30px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+  }
 
-    img {
-      max-width: 100%;
-      margin-top: 10px;
-      border-radius: 6px;
-    }
+  .card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-top: 15px;
+  }
 
-    .section {
-      margin-top: 25px;
-    }
-  </style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  label {
+    font-size: 12px;
+    color: #666;
+  }
+
+  input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #1976d2;
+  }
+
+  button {
+    margin-top: 20px;
+    padding: 12px;
+    width: 100%;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  button:hover {
+    background: #1565c0;
+  }
+
+  img {
+    width: 100%;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+
+  #result {
+    margin-top: 20px;
+    padding: 15px;
+    background: #e3f2fd;
+    border-radius: 8px;
+  }
+</style>
 </head>
+
 <body>
 
 <h2>Configuratore Lenti</h2>
 
-<div class="section">
+<div class="card">
   <h3>Carica ricetta</h3>
   <input type="file" id="fileInput" accept="image/*">
   <img id="preview">
-  <button onclick="leggiAI()">🤖 Leggi automaticamente (AI)</button>
+  <button onclick="leggiAI()">🤖 Lettura automatica (AI)</button>
 </div>
 
-<div class="section">
+<div class="card">
   <h3>Prescrizione</h3>
 
-  OD SPH <input id="od_sph">
-  CYL <input id="od_cyl">
-  AX <input id="od_axis">
+  <div class="grid">
+    <div>
+      <label>OD SPH</label>
+      <input id="od_sph" placeholder="-2.50">
+    </div>
+    <div>
+      <label>CYL</label>
+      <input id="od_cyl" placeholder="-1.00">
+    </div>
+    <div>
+      <label>AX</label>
+      <input id="od_axis" placeholder="90">
+    </div>
 
-  OS SPH <input id="os_sph">
-  CYL <input id="os_cyl">
-  AX <input id="os_axis">
+    <div>
+      <label>OS SPH</label>
+      <input id="os_sph" placeholder="-2.50">
+    </div>
+    <div>
+      <label>CYL</label>
+      <input id="os_cyl" placeholder="-1.00">
+    </div>
+    <div>
+      <label>AX</label>
+      <input id="os_axis" placeholder="90">
+    </div>
+  </div>
 </div>
 
-<div class="section">
+<div class="card">
   <h3>Parametri</h3>
-  ADD <input id="add">
-  Prisma <input id="prism">
+
+  <div class="grid">
+    <div>
+      <label>ADD</label>
+      <input id="add" placeholder="1.50">
+    </div>
+    <div>
+      <label>Prisma</label>
+      <input id="prism" placeholder="0.00">
+    </div>
+  </div>
 </div>
 
-<div class="section">
+<div class="card">
   <h3>Montatura</h3>
-  A <input id="frame_a">
-  DBL <input id="frame_dbl">
-  PD <input id="pd">
-  Altezza <input id="height">
+
+  <div class="grid-4">
+    <div>
+      <label>A</label>
+      <input id="frame_a" placeholder="52">
+    </div>
+    <div>
+      <label>DBL</label>
+      <input id="frame_dbl" placeholder="18">
+    </div>
+    <div>
+      <label>PD</label>
+      <input id="pd" placeholder="62">
+    </div>
+    <div>
+      <label>Altezza</label>
+      <input id="height" placeholder="22">
+    </div>
+  </div>
 </div>
 
 <button onclick="calcola()">Calcola</button>
@@ -84,82 +180,15 @@
 <script src="lensEngine.js"></script>
 
 <script>
-// PREVIEW IMMAGINE
 fileInput.onchange = () => {
   const file = fileInput.files[0];
-  if (file) {
-    preview.src = URL.createObjectURL(file);
-  }
+  if (file) preview.src = URL.createObjectURL(file);
 };
 
-// 🔥 COMPRESSIONE IMMAGINE (FIX PRINCIPALE)
-async function compressImage(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-
-    reader.onload = function (event) {
-      const img = new Image();
-
-      img.onload = function () {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        const maxWidth = 800;
-        const scale = maxWidth / img.width;
-
-        canvas.width = maxWidth;
-        canvas.height = img.height * scale;
-
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-        resolve(canvas.toDataURL("image/jpeg", 0.7));
-      };
-
-      img.src = event.target.result;
-    };
-
-    reader.readAsDataURL(file);
-  });
+function leggiAI() {
+  alert("Funzione AI in fase di sistemazione");
 }
 
-// 🚀 AI LETTURA
-async function leggiAI() {
-  const file = fileInput.files[0];
-  if (!file) return alert("Carica una ricetta");
-
-  const image = await compressImage(file);
-
-  const res = await fetch("/.netlify/functions/parse-prescription", {
-    method: "POST",
-    body: JSON.stringify({ image })
-  });
-
-  const text = await res.text();
-
-  console.log("AI RESULT:", text);
-
-  try {
-    const data = JSON.parse(text);
-
-    od_sph.value = data.od?.sph ?? "";
-    od_cyl.value = data.od?.cyl ?? "";
-    od_axis.value = data.od?.axis ?? "";
-
-    os_sph.value = data.os?.sph ?? "";
-    os_cyl.value = data.os?.cyl ?? "";
-    os_axis.value = data.os?.axis ?? "";
-
-    add.value = data.add ?? "";
-
-    alert("✅ Ricetta interpretata automaticamente");
-
-  } catch (e) {
-    console.error("Errore parsing:", e);
-    alert("Errore AI");
-  }
-}
-
-// CALCOLO
 function calcola() {
   const params = {
     od_sph: parseFloat(od_sph.value),
