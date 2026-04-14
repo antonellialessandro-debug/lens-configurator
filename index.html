@@ -345,8 +345,19 @@ function calcola(){
 
 
 
-  options = generaOpzioni();
-  currentIndex = 1; // consigliata
+  const baseResult = lensEngine(lastParams);
+
+const best = scegliLenteMigliore(lastParams, baseResult);
+
+options = generaOpzioni();
+
+// trova indice della lente migliore
+currentIndex = options.findIndex(o =>
+  o.index === best.index && o.design === best.design
+);
+
+// fallback sicurezza
+if (currentIndex === -1) currentIndex = 1;
 
   document.getElementById("selector").style.display="flex";
 
