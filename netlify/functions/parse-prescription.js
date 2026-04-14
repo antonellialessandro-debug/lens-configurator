@@ -24,27 +24,21 @@ export async function handler(event) {
               parts: [
                 {
                   text: `
+text: `
 Sei un esperto ottico.
 
-Analizza questa ricetta per occhiali.
+PRIMA:
+Descrivi esattamente cosa vedi nell'immagine (numeri, scritte, valori).
 
-REGOLE IMPORTANTI:
-- NON inventare dati
-- Se non sei sicuro → usa null
-- Leggi SOLO la riga "Lontano" (non "Vicino")
-- OD = occhio destro (D)
-- OS = occhio sinistro (S o I)
-- SPH = sfera
-- CYL = cilindro
-- AX = asse
+POI:
+Estrai i dati della prescrizione.
 
-ISTRUZIONI:
-- I valori sono numeri con segno (+ o -)
-- L'asse è un numero tra 0 e 180
-- Ignora campi vuoti
-- Se un dato non è leggibile → null
+REGOLE:
+- NON inventare
+- Se non leggi → null
+- Usa SOLO la riga "Lontano"
 
-Restituisci SOLO JSON valido (senza testo extra):
+Formato JSON:
 
 {
   "od": { "sph": number, "cyl": number, "axis": number },
@@ -52,8 +46,7 @@ Restituisci SOLO JSON valido (senza testo extra):
   "add": number,
   "pd": number
 }
-`
-                },
+`                },
                 {
                   inline_data: {
                     mime_type: "image/jpeg",
