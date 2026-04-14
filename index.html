@@ -84,6 +84,42 @@ button {
   border-radius:5px;
   margin-left:6px;
 }
+
+.mini-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.mini-card {
+  text-align: center;
+  padding: 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  background: #f0f0f0;
+  cursor: pointer;
+}
+
+.mini-card.best {
+  background: #e8f5e9;
+  font-weight: bold;
+  transform: scale(1.05);
+}
+
+.mini-icon {
+  font-size: 16px;
+}
+
+.mini-title {
+  font-size: 11px;
+}
+
+.mini-desc {
+  font-size: 10px;
+  color: #555;
+}
+
 </style>
 </head>
 
@@ -160,6 +196,9 @@ button {
 </div>
 
 <button class="arrow" onclick="nextOption()">&gt;</button>
+</div>
+
+<div id="optionsMiniGrid" class="mini-grid">
 </div>
 
 </div>
@@ -276,20 +315,71 @@ function generaSpiegazione(opt, params, r) {
 
   let testo = opt.desc;
 
-  if (Math.abs(r.se) > 4) {
-    testo += " In questo caso specifico, è utile ridurre lo spessore della lente.";
+  const se = Math.abs(r.se);
+
+  // SOLO per lenti sottili
+  if (se > 4 && opt.index >= 1.67) {
+    testo += " In questo caso specifico, questa lente aiuta a ridurre lo spessore.";
   }
 
-  if (r.mbs > 65) {
-    testo += " Il diametro elevato rende importante scegliere un indice più sottile.";
+  // SOLO se lente NON adeguata
+  if (se > 4 && opt.index < 1.6) {
+    testo += " Questa soluzione potrebbe risultare più spessa esteticamente.";
   }
 
-  if (params.A > 55) {
-    testo += " La montatura ampia aumenta lo spessore periferico.";
+  // diametro grande
+  if (r.mbs > 65 && opt.index >= 1.67) {
+    testo += " Il diametro elevato rende vantaggioso un indice più sottile.";
+  }
+
+  // montatura grande
+  if (params.A > 55 && opt.index < 1.6) {
+    testo += " La montatura ampia può aumentare lo spessore percepito.";
   }
 
   return testo;
 }
+
+function shortDesc(text) {
+  return text.split(",")[0];
+}
+
+function getIcon(tag) {
+  if (tag === "economica") return "💰";
+  if (tag === "consigliata") return "⚖️";
+  if (tag === "premium") return "🎯";
+  if (tag === "top") return "👑";
+  return "";
+}
+
+function renderMiniOptions() {
+
+  const container = document.getElementById("optionsMiniGrid");
+  container.innerHTML = "";
+
+  options.forEach((opt, i) => {
+
+    const isBest = i === currentIndex;
+
+    const div = document.createElement("div");
+    div.className = "mini-card" + (isBest ? " best" : "");
+
+    div.innerHTML = `
+      <div class="mini-icon">${getIcon(opt.tag)}</div>
+      <div class="mini-title">${opt.index}</div>
+      <div class="mini-desc">${shortDesc(opt.desc)}</div>
+    `;
+
+    div.onclick = () => {
+      currentIndex = i;
+      mostraOpzione();
+      renderMiniOptions();
+    };
+
+    container.appendChild(div);
+  });
+}
+
 function mostraOpzione(){
   const opt = options[currentIndex];
 
@@ -315,6 +405,7 @@ function mostraOpzione(){
     "Design: " + opt.design + "<br>" +
     "Indice: " + opt.index + "<br>" +
     "Spessore: " + r.edgeThickness + " mm";
+	renderMiniOptions();
 }
 function nextOption(){
   currentIndex=(currentIndex+1)%options.length;
