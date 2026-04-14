@@ -96,31 +96,31 @@ button {
 <div class="card">
 <h3>Prescrizione</h3>
 <div class="grid">
-<input type="number" step="0.25" id="od_sph" placeholder="OD SPH">
-<input type="number" step="0.25" id="od_cyl" placeholder="CYL">
-<input type="number" step="1" id="od_axis" placeholder="AX">
+<input type="number" step="0.25" id="od_sph"> 
+<input type="number" step="0.25" id="od_cyl"> 
+<input type="number" step="1" id="od_axis"> 
 
-<input type="number" step="0.25" id="os_sph" placeholder="OS SPH">
-<input type="number" step="0.25" id="os_cyl" placeholder="CYL">
-<input type="number" step="1" id="os_axis" placeholder="AX">
+<input type="number" step="0.25" id="os_sph"> 
+<input type="number" step="0.25" id="os_cyl"> 
+<input type="number" step="1" id="os_axis">
 </div>
 </div>
 
 <div class="card">
 <h3>Parametri</h3>
 <div class="grid">
-<input type="number" step="0.25" id="add" placeholder="ADD">
-<input type="number" step="0.25" id="prism" placeholder="Prisma">
+<input type="number" step="0.25" id="add">
+<input type="number" step="0.25" id="prism">
 </div>
 </div>
 
 <div class="card">
 <h3>Montatura</h3>
 <div class="grid-4">
-<input type="number" id="frame_a" placeholder="A (calibro)">
-<input type="number" id="frame_dbl" placeholder="DBL (ponte)">
-<input type="number" id="pd" placeholder="PD">
-<input type="number" id="height" placeholder="H (altezza)">
+<input type="number" id="frame_a">
+<input type="number" id="frame_dbl">
+<input type="number" id="pd">
+<input type="number" id="height">
 </div>
 </div>
 
@@ -148,6 +148,52 @@ button {
 let options = [];
 let currentIndex = 0;
 let lastParams = {};
+
+// 🌍 MULTILINGUA
+const lang = navigator.language.startsWith("it") ? "it" : "en";
+
+const labels = {
+  it: {
+    od_sph: "Sfera OD",
+    od_cyl: "Cilindro OD",
+    od_axis: "Asse OD",
+    os_sph: "Sfera OS",
+    os_cyl: "Cilindro OS",
+    os_axis: "Asse OS",
+    add: "Addizione",
+    prism: "Prisma",
+    frame_a: "Calibro (A)",
+    frame_dbl: "Ponte (DBL)",
+    pd: "Distanza interpupillare",
+    height: "Altezza montaggio"
+  },
+  en: {
+    od_sph: "Sphere OD",
+    od_cyl: "Cylinder OD",
+    od_axis: "Axis OD",
+    os_sph: "Sphere OS",
+    os_cyl: "Cylinder OS",
+    os_axis: "Axis OS",
+    add: "Addition",
+    prism: "Prism",
+    frame_a: "Lens width (A)",
+    frame_dbl: "Bridge (DBL)",
+    pd: "Pupillary distance",
+    height: "Fitting height"
+  }
+};
+
+function setPlaceholders() {
+  const t = labels[lang];
+
+  Object.keys(t).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.placeholder = t[id];
+  });
+}
+
+// 👉 esegui dopo caricamento pagina
+window.onload = setPlaceholders;
 
 function val(id){
   const v=parseFloat(document.getElementById(id).value);
@@ -212,51 +258,7 @@ function calcola(){
     height: val("height")
   };
 
-// 🌍 MULTILINGUA
-const lang = navigator.language.startsWith("it") ? "it" : "en";
 
-const labels = {
-  it: {
-    od_sph: "Sfera OD",
-    od_cyl: "Cilindro OD",
-    od_axis: "Asse OD",
-    os_sph: "Sfera OS",
-    os_cyl: "Cilindro OS",
-    os_axis: "Asse OS",
-    add: "Addizione",
-    prism: "Prisma",
-    frame_a: "Calibro (A)",
-    frame_dbl: "Ponte (DBL)",
-    pd: "Distanza interpupillare",
-    height: "Altezza montaggio"
-  },
-  en: {
-    od_sph: "Sphere OD",
-    od_cyl: "Cylinder OD",
-    od_axis: "Axis OD",
-    os_sph: "Sphere OS",
-    os_cyl: "Cylinder OS",
-    os_axis: "Axis OS",
-    add: "Addition",
-    prism: "Prism",
-    frame_a: "Lens width (A)",
-    frame_dbl: "Bridge (DBL)",
-    pd: "Pupillary distance",
-    height: "Fitting height"
-  }
-};
-
-function setPlaceholders() {
-  const t = labels[lang];
-
-  Object.keys(t).forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.placeholder = t[id];
-  });
-}
-
-// 👉 esegui dopo caricamento pagina
-window.addEventListener("DOMContentLoaded", setPlaceholders);
 
   options = generaOpzioni();
   currentIndex = 1; // consigliata
