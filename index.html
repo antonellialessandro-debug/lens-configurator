@@ -212,6 +212,52 @@ function calcola(){
     height: val("height")
   };
 
+// 🌍 MULTILINGUA
+const lang = navigator.language.startsWith("it") ? "it" : "en";
+
+const labels = {
+  it: {
+    od_sph: "Sfera OD",
+    od_cyl: "Cilindro OD",
+    od_axis: "Asse OD",
+    os_sph: "Sfera OS",
+    os_cyl: "Cilindro OS",
+    os_axis: "Asse OS",
+    add: "Addizione",
+    prism: "Prisma",
+    frame_a: "Calibro (A)",
+    frame_dbl: "Ponte (DBL)",
+    pd: "Distanza interpupillare",
+    height: "Altezza montaggio"
+  },
+  en: {
+    od_sph: "Sphere OD",
+    od_cyl: "Cylinder OD",
+    od_axis: "Axis OD",
+    os_sph: "Sphere OS",
+    os_cyl: "Cylinder OS",
+    os_axis: "Axis OS",
+    add: "Addition",
+    prism: "Prism",
+    frame_a: "Lens width (A)",
+    frame_dbl: "Bridge (DBL)",
+    pd: "Pupillary distance",
+    height: "Fitting height"
+  }
+};
+
+function setPlaceholders() {
+  const t = labels[lang];
+
+  Object.keys(t).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.placeholder = t[id];
+  });
+}
+
+// 👉 esegui dopo caricamento pagina
+window.addEventListener("DOMContentLoaded", setPlaceholders);
+
   options = generaOpzioni();
   currentIndex = 1; // consigliata
 
