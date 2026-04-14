@@ -2,174 +2,144 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Configuratore Lenti</title>
 
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
-    padding: 20px;
-    max-width: 900px;
-    margin: auto;
-  }
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f7fa;
+  margin: 0;
+  padding: 15px;
+}
 
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
+.container {
+  max-width: 900px;
+  margin: auto;
+}
 
-  h3 {
-    margin-top: 30px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 5px;
-  }
+h2 {
+  text-align: center;
+}
 
-  .card {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    margin-top: 15px;
-  }
+.card {
+  background: white;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
 
-  .grid-4 {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-  }
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
 
-  label {
-    font-size: 12px;
-    color: #666;
-  }
+label {
+  font-size: 12px;
+  color: #666;
+}
 
-  input {
-    width: 100%;
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
+input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
 
-  input:focus {
-    outline: none;
-    border-color: #1976d2;
-  }
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #1976d2;
+  color: white;
+  cursor: pointer;
+}
 
-  button {
-    margin-top: 20px;
-    padding: 12px;
-    width: 100%;
-    background: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 14px;
-  }
+button:hover {
+  background: #1565c0;
+}
 
-  button:hover {
-    background: #1565c0;
-  }
+#result {
+  margin-top: 15px;
+  padding: 15px;
+  background: #e3f2fd;
+  border-radius: 8px;
+}
 
-  img {
-    width: 100%;
-    border-radius: 8px;
-    margin-top: 10px;
-  }
+.selector {
+  display: none;
+  text-align: center;
+  margin-top: 15px;
+}
 
-  #result {
-    margin-top: 20px;
-    padding: 15px;
-    background: #e3f2fd;
-    border-radius: 8px;
+.selector button {
+  width: auto;
+  padding: 8px 12px;
+  margin: 0 10px;
+}
+
+.badge {
+  display: inline-block;
+  background: #1976d2;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  margin-left: 8px;
+}
+
+@media (max-width: 600px) {
+  .grid, .grid-4 {
+    grid-template-columns: 1fr 1fr;
   }
+}
 </style>
 </head>
 
 <body>
 
+<div class="container">
+
 <h2>Configuratore Lenti</h2>
 
 <div class="card">
-  <h3>Carica ricetta</h3>
-  <input type="file" id="fileInput" accept="image/*">
-  <img id="preview">
-  <button onclick="leggiAI()">🤖 Lettura automatica (AI)</button>
-</div>
-
-<div class="card">
   <h3>Prescrizione</h3>
-
   <div class="grid">
-    <div>
-      <label>OD SPH</label>
-      <input id="od_sph" placeholder="-2.50">
-    </div>
-    <div>
-      <label>CYL</label>
-      <input id="od_cyl" placeholder="-1.00">
-    </div>
-    <div>
-      <label>AX</label>
-      <input id="od_axis" placeholder="90">
-    </div>
+    <div><label>OD SPH</label><input id="od_sph" placeholder="-2.50"></div>
+    <div><label>CYL</label><input id="od_cyl" placeholder="-1.00"></div>
+    <div><label>AX</label><input id="od_axis" placeholder="90"></div>
 
-    <div>
-      <label>OS SPH</label>
-      <input id="os_sph" placeholder="-2.50">
-    </div>
-    <div>
-      <label>CYL</label>
-      <input id="os_cyl" placeholder="-1.00">
-    </div>
-    <div>
-      <label>AX</label>
-      <input id="os_axis" placeholder="90">
-    </div>
+    <div><label>OS SPH</label><input id="os_sph" placeholder="-2.50"></div>
+    <div><label>CYL</label><input id="os_cyl" placeholder="-1.00"></div>
+    <div><label>AX</label><input id="os_axis" placeholder="90"></div>
   </div>
 </div>
 
 <div class="card">
   <h3>Parametri</h3>
-
   <div class="grid">
-    <div>
-      <label>ADD</label>
-      <input id="add" placeholder="1.50">
-    </div>
-    <div>
-      <label>Prisma</label>
-      <input id="prism" placeholder="0.00">
-    </div>
+    <div><label>ADD</label><input id="add" placeholder="1.50"></div>
+    <div><label>Prisma</label><input id="prism" placeholder="0.00"></div>
   </div>
 </div>
 
 <div class="card">
   <h3>Montatura</h3>
-
   <div class="grid-4">
-    <div>
-      <label>A</label>
-      <input id="frame_a" placeholder="52">
-    </div>
-    <div>
-      <label>DBL</label>
-      <input id="frame_dbl" placeholder="18">
-    </div>
-    <div>
-      <label>PD</label>
-      <input id="pd" placeholder="62">
-    </div>
-    <div>
-      <label>Altezza</label>
-      <input id="height" placeholder="22">
-    </div>
+    <div><label>A</label><input id="frame_a" placeholder="52"></div>
+    <div><label>DBL</label><input id="frame_dbl" placeholder="18"></div>
+    <div><label>PD</label><input id="pd" placeholder="62"></div>
+    <div><label>Altezza</label><input id="height" placeholder="22"></div>
   </div>
 </div>
 
@@ -177,44 +147,94 @@
 
 <div id="result"></div>
 
+<div class="selector" id="selector">
+  <button onclick="prevOption()">⬅️</button>
+  <span id="optionLabel"></span>
+  <button onclick="nextOption()">➡️</button>
+</div>
+
+</div>
+
 <script src="lensEngine.js"></script>
 
 <script>
-fileInput.onchange = () => {
-  const file = fileInput.files[0];
-  if (file) preview.src = URL.createObjectURL(file);
-};
+let options = [];
+let currentIndex = 0;
+let lastParams = {};
 
-function leggiAI() {
-  alert("Funzione AI in fase di sistemazione");
+function val(id) {
+  const el = document.getElementById(id);
+  if (!el) return 0;
+  const v = parseFloat(el.value);
+  return isNaN(v) ? 0 : v;
+}
+
+function generaOpzioni(params) {
+  return [
+    { index: 1.5, design: "Standard", tag: "economica" },
+    { index: 1.6, design: "Asferico", tag: "consigliata" },
+    { index: 1.67, design: "Atorico", tag: "premium" },
+    { index: 1.74, design: "Freeform", tag: "ultra" }
+  ];
+}
+
+function mostraOpzione() {
+  const opt = options[currentIndex];
+
+  document.getElementById("optionLabel").innerHTML =
+    opt.design + " - indice " + opt.index +
+    ' <span class="badge">' + opt.tag + '</span>';
+
+  const r = lensEngine({
+    ...lastParams,
+    forcedIndex: opt.index,
+    forcedDesign: opt.design
+  });
+
+  document.getElementById("result").innerHTML =
+    "SE: " + r.se + "<br>" +
+    "Decentramento: " + r.decentration + " mm<br>" +
+    "Diametro: " + r.mbs + " mm<br>" +
+    "Design: " + opt.design + "<br>" +
+    "Indice: " + opt.index + "<br>" +
+    "Spessore: " + r.edgeThickness + " mm";
+}
+
+function nextOption() {
+  currentIndex = (currentIndex + 1) % options.length;
+  mostraOpzione();
+}
+
+function prevOption() {
+  currentIndex = (currentIndex - 1 + options.length) % options.length;
+  mostraOpzione();
 }
 
 function calcola() {
   const params = {
-    od_sph: parseFloat(od_sph.value),
-    od_cyl: parseFloat(od_cyl.value),
-    od_axis: parseFloat(od_axis.value),
-    os_sph: parseFloat(os_sph.value),
-    os_cyl: parseFloat(os_cyl.value),
-    os_axis: parseFloat(os_axis.value),
-    add: parseFloat(add.value),
-    prism: parseFloat(prism.value),
-    A: parseFloat(frame_a.value),
-    DBL: parseFloat(frame_dbl.value),
-    PD: parseFloat(pd.value),
-    height: parseFloat(height.value)
+    od_sph: val("od_sph"),
+    od_cyl: val("od_cyl"),
+    od_axis: val("od_axis"),
+    os_sph: val("os_sph"),
+    os_cyl: val("os_cyl"),
+    os_axis: val("os_axis"),
+    add: val("add"),
+    prism: val("prism"),
+    A: val("frame_a"),
+    DBL: val("frame_dbl"),
+    PD: val("pd"),
+    height: val("height")
   };
 
-  const r = lensEngine(params);
+  lastParams = params;
 
-  result.innerHTML =
-    "SE: " + r.se + "<br>" +
-    "Decentramento: " + r.decentration + " mm<br>" +
-    "Diametro: " + r.mbs + " mm<br>" +
-    "Corridoio: " + r.corridor + " mm<br>" +
-    "Design: " + r.design + "<br>" +
-    "Indice: " + r.index + "<br><br>" +
-    "Spessore bordo stimato: " + r.edgeThickness + " mm";
+  options = generaOpzioni(params);
+
+  currentIndex = 1; // consigliata
+
+  document.getElementById("selector").style.display = "block";
+
+  mostraOpzione();
 }
 </script>
 
