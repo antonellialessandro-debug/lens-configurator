@@ -1,35 +1,53 @@
 export async function handler(event) {
   try {
+    const { image } = JSON.parse(event.body);
 
-    if (!event.body) {
+    const VISION_KEY = process.env.VISION_API_KEY;
+    const GEMINI_KEY = process.env.GEMINI_API_KEY;
+
+    if (!image) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing body" })
+        body: JSON.stringify({ error: "No image" })
       };
     }
 
-    const body = JSON.parse(event.body);
+    const base64 = image.split(",")[1];
 
-    if (!body.image) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "No image received" })
-      };
-    }
+    // 🔥 STEP 1: OCR GOOGLE VISION
+    const visionRes = await fetch(
+      `https://vision.googleapis.com/v1/images:annotate?key=${VISION_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requests: [
+            {
+              image: { content: base64 },
+              features: [{ type: "TEXT_DETECTION" }]
+            }
+          ]
+        })
+      }
+    );
 
-    const API_KEY = process.env.GEMINI_API_KEY;
+    const visionData = await visionRes.json();
 
-    if (!API_KEY) {
+    const extractedText =
+      visionData.responses?.[0]?.fullTextAnnotation?.text || "";
+
+    console.log("OCR TEXT:", extractedText);
+
+    if (!extractedText) {
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: "Missing API key" })
+        body: JSON.stringify({ error: "OCR failed", raw: visionData })
       };
     }
 
-    const base64 = body.image.split(",")[1];
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
+    // 🔥 STEP 2: AI PARSING (GEMINI CORRETTO)
+    const aiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,12 +59,21 @@ export async function handler(event) {
                   text: `
 Sei un esperto ottico.
 
-Descrivi prima cosa vedi nell'immagine.
-Poi estrai i dati della prescrizione.
+Questo è il testo estratto da una ricetta:
 
-NON inventare dati.
+${extractedText}
+
+Estrai i dati ottici.
+
+REGOLE:
+- NON inventare dati
+- Se manca → null
+- Usa SOLO visione da lontano
+- OD = destro
+- OS = sinistro
 
 Formato JSON:
+
 {
   "od": { "sph": number, "cyl": number, "axis": number },
   "os": { "sph": number, "cyl": number, "axis": number },
@@ -54,12 +81,6 @@ Formato JSON:
   "pd": number
 }
 `
-                },
-                {
-                  inline_data: {
-                    mime_type: "image/jpeg",
-                    data: base64
-                  }
                 }
               ]
             }
@@ -68,20 +89,26 @@ Formato JSON:
       }
     );
 
-    const data = await response.json();
+    const aiData = await aiRes.json();
 
-    console.log("GEMINI RAW:", JSON.stringify(data));
+    console.log("AI RAW:", JSON.stringify(aiData));
 
-    let text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    let text = aiData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!text) {
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: "Empty AI response", raw: data })
+        body: JSON.stringify({
+          error: "Empty AI response",
+          raw: aiData
+        })
       };
     }
 
-    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    text = text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
 
     return {
       statusCode: 200,
