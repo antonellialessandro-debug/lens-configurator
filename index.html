@@ -80,9 +80,33 @@ button:hover {
   display: none;
   justify-content: center;
   align-items: center;
-  margin-top: 15px;
+  gap: 15px;
+  margin-top: 20px;
 }
 
+.arrow {
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  width: 45px;
+  height: 45px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.arrow:hover {
+  background: #1565c0;
+  transform: scale(1.1);
+}
+
+.option-box {
+  background: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  font-weight: bold;
+}
 .selector button {
   width: auto;
   padding: 8px 12px;
@@ -149,11 +173,14 @@ button:hover {
 <div id="result"></div>
 
 <div class="selector" id="selector">
-  <button onclick="prevOption()">⬅️</button>
-  <span id="optionLabel"></span>
-  <button onclick="nextOption()">➡️</button>
-</div>
+  <button class="arrow" onclick="prevOption()">⬅</button>
 
+  <div class="option-box">
+    <div id="optionLabel"></div>
+  </div>
+
+  <button class="arrow" onclick="nextOption()">➡</button>
+</div>
 </div>
 
 <script src="lensEngine.js"></script>
