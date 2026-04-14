@@ -96,15 +96,38 @@ button {
 <div class="card">
 <h3>Prescrizione</h3>
 <div class="grid">
-<input type="number" step="0.25" id="od_sph"> 
-<input type="number" step="0.25" id="od_cyl"> 
-<input type="number" step="1" id="od_axis"> 
 
-<input type="number" step="0.25" id="os_sph"> 
-<input type="number" step="0.25" id="os_cyl"> 
+<div>
+<label id="lbl_od_sph">OD</label>
+<input type="number" step="0.25" id="od_sph">
+</div>
+
+<div>
+<label id="lbl_od_cyl">CYL</label>
+<input type="number" step="0.25" id="od_cyl">
+</div>
+
+<div>
+<label id="lbl_od_axis">AX</label>
+<input type="number" step="1" id="od_axis">
+</div>
+
+<div>
+<label id="lbl_os_sph">OS</label>
+<input type="number" step="0.25" id="os_sph">
+</div>
+
+<div>
+<label id="lbl_os_cyl">CYL</label>
+<input type="number" step="0.25" id="os_cyl">
+</div>
+
+<div>
+<label id="lbl_os_axis">AX</label>
 <input type="number" step="1" id="os_axis">
 </div>
-</div>
+
+</div></div>
 
 <div class="card">
 <h3>Parametri</h3>
@@ -184,7 +207,25 @@ const labels = {
 };
 
 function setPlaceholders() {
+function setLabels() {
   const t = labels[lang];
+
+  const map = {
+    lbl_od_sph: t.od_sph,
+    lbl_od_cyl: t.od_cyl,
+    lbl_od_axis: t.od_axis,
+    lbl_os_sph: t.os_sph,
+    lbl_os_cyl: t.os_cyl,
+    lbl_os_axis: t.os_axis
+  };
+
+  for (const id in map) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = map[id];
+  }
+}  
+
+const t = labels[lang];
 
   Object.keys(t).forEach(id => {
     const el = document.getElementById(id);
@@ -193,7 +234,10 @@ function setPlaceholders() {
 }
 
 // 👉 esegui dopo caricamento pagina
-window.onload = setPlaceholders;
+window.onload = () => {
+  setPlaceholders();
+  setLabels();
+};
 
 function val(id){
   const v=parseFloat(document.getElementById(id).value);
