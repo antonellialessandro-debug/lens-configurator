@@ -245,13 +245,32 @@ function val(id){
 
 function generaOpzioni(){
   return [
-    {index:1.5, design:"Standard", tag:"economica"},
-    {index:1.6, design:"Asferico", tag:"consigliata"},
-    {index:1.67, design:"Atorico", tag:"premium"},
-    {index:1.74, design:"Freeform", tag:"top"}
+    {
+      index:1.5,
+      design:"Standard",
+      tag:"economica",
+      desc:"Soluzione base, adatta a correzioni leggere con un costo contenuto."
+    },
+    {
+      index:1.6,
+      design:"Asferico",
+      tag:"consigliata",
+      desc:"Buon equilibrio tra estetica e comfort, con riduzione dello spessore rispetto allo standard."
+    },
+    {
+      index:1.67,
+      design:"Atorico",
+      tag:"premium",
+      desc:"Migliore qualità visiva e minori distorsioni laterali, ideale per correzioni più elevate."
+    },
+    {
+      index:1.74,
+      design:"Freeform",
+      tag:"top",
+      desc:"Massima sottigliezza e prestazioni ottiche personalizzate, per il miglior risultato possibile."
+    }
   ];
 }
-
 function mostraOpzione(){
   const opt=options[currentIndex];
 
