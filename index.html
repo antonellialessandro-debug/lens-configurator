@@ -127,7 +127,7 @@ button {
 
 <div class="container">
 
-<h2>Configuratore Lenti v2.4</h2>
+<h2>Configuratore Lenti v2.45</h2>
 
 <div class="card">
 <h3>Prescrizione</h3>
@@ -313,6 +313,7 @@ function generaOpzioni(){
 
 function generaSpiegazione(opt, params, r) {
 
+
   let testo = opt.desc;
 
   const se = Math.abs(r.se);
@@ -340,6 +341,36 @@ function generaSpiegazione(opt, params, r) {
   return testo;
 }
 
+function scegliLenteMigliore(params, r) {
+
+  let score = Math.abs(r.se);
+
+  let index = 1.5;
+  let design = "Standard";
+  let tag = "economica";
+
+  if (score > 2) {
+    index = 1.6;
+    design = "Asferico";
+    tag = "consigliata";
+  }
+
+  if (score > 4) {
+    index = 1.67;
+    design = "Atorico";
+    tag = "premium";
+  }
+
+  if (score > 6 || r.mbs > 65) {
+    index = 1.74;
+    design = "Freeform";
+    tag = "top";
+  }
+
+  return { index, design, tag };
+}
+
+
 function shortDesc(text) {
   return text.split(",")[0];
 }
@@ -366,7 +397,7 @@ function renderMiniOptions() {
 
     div.innerHTML = `
       <div class="mini-icon">${getIcon(opt.tag)}</div>
-      <div class="mini-title">${opt.index}</div>
+      <div class="mini-title">${opt.design} ${opt.index}</div>
       <div class="mini-desc">${shortDesc(opt.desc)}</div>
     `;
 
@@ -405,7 +436,8 @@ function mostraOpzione(){
     "Design: " + opt.design + "<br>" +
     "Indice: " + opt.index + "<br>" +
     "Spessore: " + r.edgeThickness + " mm";
-	renderMiniOptions();
+	
+renderMiniOptions();
 }
 function nextOption(){
   currentIndex=(currentIndex+1)%options.length;
