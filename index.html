@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Configuratore Lenti</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #f5f7fa;
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+h2 { text-align: center; }
+
+h3 {
+  margin-top: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.field {
+  flex: 1;
+  min-width: 120px;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  margin-top: 15px;
+  width: 100%;
+  padding: 12px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.result {
+  margin-top: 25px;
+  padding: 20px;
+  background: #f9fafc;
+  border-radius: 10px;
+}
+
+.highlight {
+  background: #e8f4ff;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.price { font-size: 18px; font-weight: bold; }
+.old-price { text-decoration: line-through; color: gray; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Configuratore Lenti</h2>
+
+<!-- UPLOAD -->
+<h3>Carica ricetta</h3>
+
+<input type="file" id="upload" accept="image/*"><br><br>
+
+<img id="preview" style="max-width:100%; display:none; border-radius:10px;"><br>
+
+<button onclick="leggiRicetta()">🤖 Leggi automaticamente (AI)</button>
+
+<h3>Prescrizione</h3>
+
+<div class="row">
+  <div class="field">
+    OD SPH
+    <input id="od_sph" type="number" step="0.25" placeholder="-2.50">
+  </div>
+
+  <div class="field">
+    CYL
+    <input id="od_cyl" type="number" step="0.25" placeholder="-1.00">
+  </div>
+
+  <div class="field">
+    AX
+    <input id="od_axis" type="number" placeholder="90">
+  </div>
+</div>
+
+<div class="row">
+  <div class="field">
+    OS SPH
+    <input id="os_sph" type="number" step="0.25" placeholder="-2.50">
+  </div>
+
+  <div class="field">
+    CYL
+    <input id="os_cyl" type="number" step="0.25" placeholder="-1.00">
+  </div>
+
+  <div class="field">
+    AX
+    <input id="os_axis" type="number" placeholder="90">
+  </div>
+</div>
+
+<h3>Parametri</h3>
+
+<div class="row">
+  <div class="field">
+    ADD
+    <input id="add" type="number" step="0.25" placeholder="1.50">
+  </div>
+
+  <div class="field">
+    Prisma
+    <input id="prism" type="number" step="0.25" placeholder="0.00">
+  </div>
+</div>
+
+<h3>Montatura</h3>
+
+<div class="row">
+  <div class="field">
+    A
+    <input id="frame_a" type="number" placeholder="52">
+  </div>
+
+  <div class="field">
+    DBL
+    <input id="frame_dbl" type="number" placeholder="18">
+  </div>
+
+  <div class="field">
+    PD
+    <input id="pd" type="number" placeholder="62">
+  </div>
+
+  <div class="field">
+    Altezza
+    <input id="height" type="number" placeholder="22">
+  </div>
+</div>
+
+<button onclick="calcola()">Calcola</button>
+
+<div id="result" class="result"></div>
+
+</div>
+
+<script src="lensEngine.js"></script>
+
+<script>
+
+// preview immagine
+upload.addEventListener("change", function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(event) {
+    preview.src = event.target.result;
+    preview.style.display = "block";
+  };
+
+  reader.readAsDataURL(file);
+});
+
+
+// AI Gemini
+function leggiRicetta() {
+
+  if (!preview.src) {
+    alert("Carica una ricetta prima");
+    return;
+  }
+
+  result.innerHTML = "🤖 Analisi AI in corso...";
+
+  fetch("/.netlify/functions/parse-prescription", {
+    method: "POST",
+    body: JSON.stringify({ image: preview.src })
+  })
+  .then(res => res.json())
+  .then(data => {
+
+    console.log("AI RESULT:", data);
+
+    if (data.od) {
+      od_sph.value = data.od.sph || "";
+      od_cyl.value = data.od.cyl || "";
+      od_axis.value = data.od.axis || "";
+    }
+
+    if (data.os) {
+      os_sph.value = data.os.sph || "";
+      os_cyl.value = data.os.cyl || "";
+      os_axis.value = data.os.axis || "";
+    }
+
+    if (data.add) add.value = data.add;
+    if (data.pd) pd.value = data.pd;
+
+    result.innerHTML = "✅ Ricetta interpretata automaticamente";
+
+  })
+  .catch(err => {
+    console.error(err);
+    result.innerHTML = "❌ Errore AI";
+  });
+}
+
+
+// calcolo
+function calcola() {
+
+  const params = {
+    od_sph: parseFloat(od_sph.value),
+    od_cyl: parseFloat(od_cyl.value),
+    od_axis: parseFloat(od_axis.value),
+
+    os_sph: parseFloat(os_sph.value),
+    os_cyl: parseFloat(os_cyl.value),
+    os_axis: parseFloat(os_axis.value),
+
+    add: parseFloat(add.value),
+    prism: parseFloat(prism.value),
+
+    A: parseFloat(frame_a.value),
+    DBL: parseFloat(frame_dbl.value),
+    PD: parseFloat(pd.value),
+    height: parseFloat(height.value)
+  };
+
+  fetch("lenses.json")
+    .then(res => res.json())
+    .then(data => {
+
+      const r = lensEngine(params);
+      const lens = data.lenses.find(l => l.type === r.recommended);
+
+      let base = lens.base_price;
+      let final = applyDiscount(base, lens.discounts);
+
+      result.innerHTML = `
+        <div class="highlight">
+          ⭐ <b>Lente consigliata</b><br>
+          ${lens.name}<br><br>
+
+          <span class="old-price">€${base}</span><br>
+          <span class="price">€${final}</span>
+        </div>
+
+        <b>Dati tecnici:</b><br>
+        Diametro: ${r.mbs} mm<br>
+        Spessore: ${r.edgeThickness} mm<br>
+      `;
+
+    });
+}
+</script>
+
+</body>
+</html>

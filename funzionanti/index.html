@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Configuratore Lenti</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input { margin: 5px 0; }
+    .error { border: 2px solid red; }
+  </style>
+</head>
+<body>
+
+<h2>Configuratore Lenti</h2>
+
+<h3>OD</h3>
+SPH <input id="od_sph" type="number" step="0.25"><br>
+CYL <input id="od_cyl" type="number" step="0.25"><br>
+AX <input id="od_axis" type="number" min="0" max="180"><br>
+
+<h3>OS</h3>
+SPH <input id="os_sph" type="number" step="0.25"><br>
+CYL <input id="os_cyl" type="number" step="0.25"><br>
+AX <input id="os_axis" type="number" min="0" max="180"><br>
+
+<h3>Generale</h3>
+ADD <input id="add" type="number" step="0.25"><br>
+Prisma <input id="prism" type="number" step="0.25"><br>
+
+<h3>Montatura</h3>
+A <input id="frame_a" type="number"><br>
+DBL <input id="frame_dbl" type="number"><br>
+PD <input id="pd" type="number"><br>
+Altezza <input id="height" type="number"><br>
+
+<br>
+<button onclick="calcola()">Calcola</button>
+
+<div id="result"></div>
+
+<script src="lensEngine.js"></script>
+
+<script>
+function validate() {
+  let valid = true;
+  document.querySelectorAll("input").forEach(i => {
+    i.classList.remove("error");
+    if (i.value === "" || isNaN(i.value)) {
+      i.classList.add("error");
+      valid = false;
+    }
+  });
+  return valid;
+}
+
+function calcola() {
+  if (!validate()) {
+    result.innerHTML = "⚠️ Controlla i campi evidenziati";
+    return;
+  }
+
+  const params = {
+    od_sph: parseFloat(od_sph.value),
+    od_cyl: parseFloat(od_cyl.value),
+    od_axis: parseFloat(od_axis.value),
+
+    os_sph: parseFloat(os_sph.value),
+    os_cyl: parseFloat(os_cyl.value),
+    os_axis: parseFloat(os_axis.value),
+
+    add: parseFloat(add.value),
+    prism: parseFloat(prism.value),
+
+    A: parseFloat(frame_a.value),
+    DBL: parseFloat(frame_dbl.value),
+    PD: parseFloat(pd.value),
+    height: parseFloat(height.value)
+  };
+
+  const r = lensEngine(params);
+
+  result.innerHTML =
+    "SE: " + r.se + "<br>" +
+    "Decentramento: " + r.decentration + " mm<br>" +
+    "Diametro: " + r.mbs + " mm<br>" +
+    "Corridoio: " + r.corridor + " mm<br>" +
+    "Design: " + r.design + "<br>" +
+    "Indice: " + r.index + "<br><br>" +
+    "Spessore bordo stimato: " + r.edgeThickness + " mm<br><br>" +
+
+    "<b>Soluzioni consigliate:</b><br>" +
+
+    r.solutions.map(s => {
+      let best = s.name === r.recommended;
+
+      return (best ? "⭐ <b>" : "") +
+        s.name + " → " + s.design + " / indice " + s.index +
+        (best ? "</b>" : "") +
+        "<br><i>" + s.reason + "</i><br><br>";
+    }).join("");
+}
+</script>
+
+</body>
+</html>
