@@ -125,6 +125,16 @@ button {
 
 <body>
 
+<script>
+  const passwordCorretta = "Moriero1";
+
+  const userInput = prompt("Inserisci la password:");
+
+  if (userInput !== passwordCorretta) {
+    document.body.innerHTML = "<h1>Accesso negato</h1>";
+  }
+</script>
+
 <div class="container">
 
 <h2>Configuratore Lenti v2.5</h2>
