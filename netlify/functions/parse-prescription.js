@@ -14,7 +14,7 @@ export async function handler(event) {
 
     const base64 = image.split(",")[1];
 
-    // 🔥 STEP 1: OCR GOOGLE VISION
+    // OCR GOOGLE VISION
     const visionRes = await fetch(
       `https://vision.googleapis.com/v1/images:annotate?key=${VISION_KEY}`,
       {
@@ -45,9 +45,9 @@ export async function handler(event) {
       };
     }
 
-    // 🔥 STEP 2: AI PARSING (GEMINI CORRETTO)
+    // 🔥 MODELLO CORRETTO (NUOVO)
     const aiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -59,18 +59,16 @@ export async function handler(event) {
                   text: `
 Sei un esperto ottico.
 
-Questo è il testo estratto da una ricetta:
+Questo è il testo OCR:
 
 ${extractedText}
 
-Estrai i dati ottici.
+Estrai i dati della prescrizione.
 
 REGOLE:
-- NON inventare dati
+- NON inventare
 - Se manca → null
-- Usa SOLO visione da lontano
-- OD = destro
-- OS = sinistro
+- Usa visione da lontano
 
 Formato JSON:
 
@@ -105,10 +103,7 @@ Formato JSON:
       };
     }
 
-    text = text
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
 
     return {
       statusCode: 200,
@@ -119,8 +114,7 @@ Formato JSON:
     return {
       statusCode: 500,
       body: JSON.stringify({
-        error: error.message,
-        stack: error.stack
+        error: error.message
       })
     };
   }
