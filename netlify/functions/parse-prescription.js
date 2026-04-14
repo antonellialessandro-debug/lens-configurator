@@ -45,9 +45,9 @@ export async function handler(event) {
       };
     }
 
-    // 🔥 MODELLO CORRETTO (NUOVO)
+    // 🔥 MODELLO SICURO COMPATIBILE
     const aiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -64,11 +64,6 @@ Questo è il testo OCR:
 ${extractedText}
 
 Estrai i dati della prescrizione.
-
-REGOLE:
-- NON inventare
-- Se manca → null
-- Usa visione da lontano
 
 Formato JSON:
 
