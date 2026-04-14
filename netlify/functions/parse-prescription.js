@@ -1,10 +1,18 @@
 export async function handler(event) {
-
   try {
+
     const { image } = JSON.parse(event.body);
+    const API_KEY = process.env.GEMINI_API_KEY;
+
+    if (!image) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "No image provided" })
+      };
+    }
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=YOUR_API_KEY",
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
       {
         method: "POST",
         headers: {
@@ -16,18 +24,35 @@ export async function handler(event) {
               parts: [
                 {
                   text: `
-Analizza questa prescrizione ottica e restituisci SOLO JSON valido.
+Sei un esperto ottico.
 
-Formato:
+Analizza questa ricetta per occhiali.
+
+REGOLE IMPORTANTI:
+- NON inventare dati
+- Se non sei sicuro → usa null
+- Leggi SOLO la riga "Lontano" (non "Vicino")
+- OD = occhio destro (D)
+- OS = occhio sinistro (S o I)
+- SPH = sfera
+- CYL = cilindro
+- AX = asse
+
+ISTRUZIONI:
+- I valori sono numeri con segno (+ o -)
+- L'asse è un numero tra 0 e 180
+- Ignora campi vuoti
+- Se un dato non è leggibile → null
+
+Restituisci SOLO JSON valido (senza testo extra):
+
 {
   "od": { "sph": number, "cyl": number, "axis": number },
   "os": { "sph": number, "cyl": number, "axis": number },
   "add": number,
   "pd": number
 }
-
-Se un valore manca → usa null.
-                `
+`
                 },
                 {
                   inline_data: {
@@ -44,10 +69,13 @@ Se un valore manca → usa null.
 
     const data = await response.json();
 
-    let text = data.candidates[0].content.parts[0].text;
+    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
 
-    // pulizia output
-    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    // pulizia output (rimuove eventuali ```json)
+    text = text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
 
     return {
       statusCode: 200,
@@ -57,7 +85,9 @@ Se un valore manca → usa null.
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message })
+      body: JSON.stringify({
+        error: error.message
+      })
     };
   }
 }
