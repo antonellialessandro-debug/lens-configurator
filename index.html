@@ -389,35 +389,48 @@ function generaDiagnosi(params, r) {
   const cylOS = Math.abs(params.os_cyl);
   const maxCyl = Math.max(cylOD, cylOS);
 
-  let testo = "";
+  let profilo = "";
+  let impatto = "";
+  let consiglio = "";
 
-  // PROFILO VISIVO
+  // PROFILO
   if (se < -0.5) {
-    if (Math.abs(se) < 3) testo = "Miopia lieve";
-    else if (Math.abs(se) < 6) testo = "Miopia media";
-    else testo = "Miopia elevata";
+    if (Math.abs(se) < 3) profilo = "Miopia lieve";
+    else if (Math.abs(se) < 6) profilo = "Miopia media";
+    else profilo = "Miopia elevata";
   }
 
   if (se > 0.5) {
-    if (se < 3) testo = "Ipermetropia lieve";
-    else testo = "Ipermetropia media";
+    if (se < 3) profilo = "Ipermetropia lieve";
+    else profilo = "Ipermetropia media";
   }
 
   // ASTIGMATISMO
   if (maxCyl >= 0.75 && maxCyl < 2) {
-    testo += " con astigmatismo lieve";
+    profilo += " con astigmatismo lieve";
   } else if (maxCyl >= 2 && maxCyl < 3.5) {
-    testo += " con astigmatismo moderato";
+    profilo += " con astigmatismo moderato";
   } else if (maxCyl >= 3.5) {
-    testo += " con astigmatismo elevato";
+    profilo += " con astigmatismo elevato";
+  }
+
+  // IMPATTO
+  if (Math.abs(se) > 3) {
+    impatto = "Possibili difficoltà nella visione nitida soprattutto senza correzione.";
   }
 
   // MULTIFOCALE
   if (params.isProgressive) {
-    testo += ". Necessaria correzione multifocale";
+    consiglio = "Si consiglia una lente progressiva per una visione fluida a tutte le distanze.";
+  } else {
+    consiglio = "Indicata una lente monofocale ottimizzata per comfort e qualità visiva.";
   }
 
-  return testo + ".";
+  return `
+  <b>Profilo visivo:</b> ${profilo}.<br>
+  <b>Impatto visivo:</b> ${impatto}<br>
+  <b>Consiglio:</b> ${consiglio}
+  `;
 }
 
 function shortDesc(text) {
