@@ -374,6 +374,21 @@ function scegliLenteMigliore_v2(params, r) {
     reasons.push("altezza ampia");
   }
 
+// 🚨 CASI ALTA POTENZA (override reale)
+if (!params.isProgressive && se > 5) {
+  index = 1.67;
+  design = "Atorico";
+  tag = "premium";
+  reasons.push("alta gradazione");
+}
+
+if (!params.isProgressive && (se > 6 || r.mbs > 70)) {
+  index = 1.74;
+  design = "Freeform";
+  tag = "top";
+  reasons.push("spessore critico");
+}
+
   // 🎯 DECISIONE FINALE
 
   if (score <= 1) {
