@@ -362,10 +362,41 @@ function scegliLenteMigliore(params, r) {
   let index = 1.5;
   let design = "Standard";
   let tag = "economica";
+  let upgradeReason = null;
 
-  let upgradeReason = null; // 👈 NUOVO
+  // 🔵 MULTIFOCALE
+  if (params.add > 0.75) {
 
-  // BASE
+    index = 1.6;
+    design = "Progressivo";
+    tag = "consigliata";
+    upgradeReason = "visione multifocale";
+
+    if (se > 4) {
+      index = 1.67;
+      tag = "premium";
+    }
+
+    if (se > 6 || r.mbs > 65) {
+      index = 1.74;
+      tag = "top";
+    }
+
+    // 👉 altezza montatura
+    if (params.height > 0 && params.height < 16) {
+      design = "Progressivo corto";
+      upgradeReason = "montatura bassa";
+    }
+
+    if (params.height >= 18) {
+      design = "Progressivo comfort";
+    }
+
+    return { index, design, tag, upgradeReason };
+  }
+
+  // 🟢 MONOFOCALE (logica attuale migliorata)
+
   if (se > 2) {
     index = 1.6;
     design = "Asferico";
@@ -384,7 +415,7 @@ function scegliLenteMigliore(params, r) {
     tag = "top";
   }
 
-  // ASTIGMATISMO → FORZA DESIGN
+  // astigmatismo
   if (maxCyl >= 1.5 && design === "Standard") {
     design = "Asferico";
     tag = "consigliata";
@@ -405,7 +436,6 @@ function scegliLenteMigliore(params, r) {
 
   return { index, design, tag, upgradeReason };
 }
-
 function shortDesc(text) {
   return text.split(",")[0];
 }
@@ -514,7 +544,7 @@ function calcola(){
     height: val("height")
   };
 
-
+  lastParams.isProgressive = lastParams.add > 0.75;
 
   const baseResult = lensEngine(lastParams);
 
