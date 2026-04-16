@@ -468,7 +468,9 @@ function renderMiniOptions() {
   });
 }
 function mostraOpzione(){
-  const opt = options[currentIndex];
+
+console.log("MOSTRA OPZIONE ATTIVA"); 
+ const opt = options[currentIndex];
 
   // 👉 PRIMA calcolo
   const r = lensEngine({
@@ -479,9 +481,17 @@ function mostraOpzione(){
 
 const diagnosi = generaDiagnosi(lastParams, r);
 
-document.getElementById("diagnosiBox").style.display = "block";
-document.getElementById("diagnosiText").innerText = diagnosi;
+console.log("DIAGNOSI:", diagnosi);
 
+const box = document.getElementById("diagnosiBox");
+const text = document.getElementById("diagnosiText");
+
+if (box && text) {
+  box.style.display = "block";
+  text.innerText = diagnosi;
+} else {
+  console.log("ERRORE: diagnosiBox non trovato");
+}
   // 👉 POI UI
   let extra = "";
 
@@ -565,6 +575,7 @@ function calcola(){
 
   mostraOpzione();
 }
+
 function scegliLenteMigliore(params, r) {
 
   const se = Math.abs(r.se);
