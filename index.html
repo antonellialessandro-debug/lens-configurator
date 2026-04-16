@@ -501,7 +501,7 @@ const text = document.getElementById("diagnosiText");
 
 if (box && text) {
   box.style.display = "block";
-  text.innerText = diagnosi;
+ text.innerHTML = diagnosi;
 } else {
   console.log("ERRORE: diagnosiBox non trovato");
 }
