@@ -486,7 +486,7 @@ function calcola(){
     height: val("height")
   };
 
-  lastParams.isProgressive = lastParams.add > 0.75;
+  lastParams.isProgressive = !isNaN(lastParams.add) && lastParams.add > 0.75;
 
   const baseResult = lensEngine(lastParams);
 
