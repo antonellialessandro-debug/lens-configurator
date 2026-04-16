@@ -197,6 +197,17 @@ button {
 
 <div id="result"></div>
 
+<div id="diagnosiBox" style="
+  margin-top:15px;
+  background:#fff8e1;
+  padding:15px;
+  border-radius:10px;
+  display:none;
+  border-left:5px solid #ff9800;
+">
+  <div id="diagnosiText"></div>
+</div>
+
 <!-- 🔥 SELETTORE LENTE -->
 <div class="selector" id="selector">
 <button class="arrow" onclick="prevOption()">&lt;</button>
@@ -371,6 +382,44 @@ function generaSpiegazione(opt, params, r) {
   return testo;
 }
 
+function generaDiagnosi(params, r) {
+
+  const se = r.se;
+  const cylOD = Math.abs(params.od_cyl);
+  const cylOS = Math.abs(params.os_cyl);
+  const maxCyl = Math.max(cylOD, cylOS);
+
+  let testo = "";
+
+  // PROFILO VISIVO
+  if (se < -0.5) {
+    if (Math.abs(se) < 3) testo = "Miopia lieve";
+    else if (Math.abs(se) < 6) testo = "Miopia media";
+    else testo = "Miopia elevata";
+  }
+
+  if (se > 0.5) {
+    if (se < 3) testo = "Ipermetropia lieve";
+    else testo = "Ipermetropia media";
+  }
+
+  // ASTIGMATISMO
+  if (maxCyl >= 0.75 && maxCyl < 2) {
+    testo += " con astigmatismo lieve";
+  } else if (maxCyl >= 2 && maxCyl < 3.5) {
+    testo += " con astigmatismo moderato";
+  } else if (maxCyl >= 3.5) {
+    testo += " con astigmatismo elevato";
+  }
+
+  // MULTIFOCALE
+  if (params.isProgressive) {
+    testo += ". Necessaria correzione multifocale";
+  }
+
+  return testo + ".";
+}
+
 function shortDesc(text) {
   return text.split(",")[0];
 }
@@ -427,6 +476,11 @@ function mostraOpzione(){
     forcedIndex: opt.index,
     forcedDesign: opt.design
   });
+
+const diagnosi = generaDiagnosi(lastParams, r);
+
+document.getElementById("diagnosiBox").style.display = "block";
+document.getElementById("diagnosiText").innerText = diagnosi;
 
   // 👉 POI UI
   let extra = "";
