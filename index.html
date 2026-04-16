@@ -317,6 +317,26 @@ function generaOpzioni(){
       design:"Freeform",
       tag:"top",
       desc:"Massima sottigliezza e prestazioni ottiche personalizzate, per il miglior risultato possibile."
+    },
+
+    // 🔵 NUOVE MULTIFOCALI
+    {
+      index:1.6,
+      design:"Progressivo",
+      tag:"consigliata",
+      desc:"Lente multifocale per visione a tutte le distanze."
+    },
+    {
+      index:1.67,
+      design:"Progressivo corto",
+      tag:"premium",
+      desc:"Adatta a montature basse con corridoio ridotto."
+    },
+    {
+      index:1.74,
+      design:"Progressivo comfort",
+      tag:"top",
+      desc:"Massimo comfort visivo con campi più ampi."
     }
   ];
 }
@@ -351,91 +371,6 @@ function generaSpiegazione(opt, params, r) {
   return testo;
 }
 
-function scegliLenteMigliore(params, r) {
-
-  const se = Math.abs(r.se);
-
-  const cylOD = Math.abs(params.od_cyl);
-  const cylOS = Math.abs(params.os_cyl);
-  const maxCyl = Math.max(cylOD, cylOS);
-
-  let index = 1.5;
-  let design = "Standard";
-  let tag = "economica";
-  let upgradeReason = null;
-
-  // 🔵 MULTIFOCALE
-  if (params.add > 0.75) {
-
-    index = 1.6;
-    design = "Progressivo";
-    tag = "consigliata";
-    upgradeReason = "visione multifocale";
-
-    if (se > 4) {
-      index = 1.67;
-      tag = "premium";
-    }
-
-    if (se > 6 || r.mbs > 65) {
-      index = 1.74;
-      tag = "top";
-    }
-
-    // 👉 altezza montatura
-    if (params.height > 0 && params.height < 16) {
-      design = "Progressivo corto";
-      upgradeReason = "montatura bassa";
-    }
-
-    if (params.height >= 18) {
-      design = "Progressivo comfort";
-    }
-
-    return { index, design, tag, upgradeReason };
-  }
-
-  // 🟢 MONOFOCALE (logica attuale migliorata)
-
-  if (se > 2) {
-    index = 1.6;
-    design = "Asferico";
-    tag = "consigliata";
-  }
-
-  if (se > 4) {
-    index = 1.67;
-    design = "Atorico";
-    tag = "premium";
-  }
-
-  if (se > 6 || r.mbs > 65) {
-    index = 1.74;
-    design = "Freeform";
-    tag = "top";
-  }
-
-  // astigmatismo
-  if (maxCyl >= 1.5 && design === "Standard") {
-    design = "Asferico";
-    tag = "consigliata";
-    upgradeReason = "astigmatismo";
-  }
-
-  if (maxCyl >= 2.5) {
-    design = "Atorico";
-    tag = "premium";
-    upgradeReason = "astigmatismo elevato";
-  }
-
-  if (maxCyl >= 3.5) {
-    design = "Freeform";
-    tag = "top";
-    upgradeReason = "astigmatismo molto elevato";
-  }
-
-  return { index, design, tag, upgradeReason };
-}
 function shortDesc(text) {
   return text.split(",")[0];
 }
@@ -453,9 +388,18 @@ function renderMiniOptions() {
   const container = document.getElementById("optionsMiniGrid");
   container.innerHTML = "";
 
-  options.forEach((opt, i) => {
+  const filtered = options.filter(opt => {
+    if (lastParams.isProgressive) {
+      return opt.design.includes("Progressivo");
+    } else {
+      return !opt.design.includes("Progressivo");
+    }
+  });
 
-    const isBest = i === currentIndex;
+  filtered.forEach((opt, i) => {
+
+    const realIndex = options.indexOf(opt);
+    const isBest = realIndex === currentIndex;
 
     const div = document.createElement("div");
     div.className = "mini-card" + (isBest ? " best" : "");
@@ -467,15 +411,13 @@ function renderMiniOptions() {
     `;
 
     div.onclick = () => {
-      currentIndex = i;
+      currentIndex = realIndex;
       mostraOpzione();
-      renderMiniOptions();
     };
 
     container.appendChild(div);
   });
 }
-
 function mostraOpzione(){
   const opt = options[currentIndex];
 
@@ -548,26 +490,115 @@ function calcola(){
 
   const baseResult = lensEngine(lastParams);
 
-const best = scegliLenteMigliore(lastParams, baseResult);
+  const best = scegliLenteMigliore(lastParams, baseResult);
 
-window.bestReason = best.upgradeReason; // 👈 salva globale
+  window.bestReason = best.upgradeReason;
 
-options = generaOpzioni();
+  // 👉 GENERA OPZIONI
+  options = generaOpzioni();
 
-// trova indice della lente migliore
-currentIndex = options.findIndex(o =>
-  o.index === best.index && o.design === best.design
-);
+  // 👉 trova migliore
+  currentIndex = options.findIndex(o =>
+    o.index === best.index && o.design === best.design
+  );
 
-// fallback sicurezza
-if (currentIndex === -1) currentIndex = 1;
+  if (currentIndex === -1) currentIndex = 1;
 
-window.bestIndex = currentIndex; // 👈 NUOVO
+  window.bestIndex = currentIndex;
 
-
+  // 👉 mostra UI
   document.getElementById("selector").style.display="flex";
 
   mostraOpzione();
+}
+function scegliLenteMigliore(params, r) {
+
+  const se = Math.abs(r.se);
+
+  const cylOD = Math.abs(params.od_cyl);
+  const cylOS = Math.abs(params.os_cyl);
+  const maxCyl = Math.max(cylOD, cylOS);
+
+  let index = 1.5;
+  let design = "Standard";
+  let tag = "economica";
+  let upgradeReason = null;
+
+  // 🔵 MULTIFOCALE
+ if (params.isProgressive) {
+
+    index = 1.6;
+    design = "Progressivo";
+    tag = "consigliata";
+    upgradeReason = "visione multifocale";
+
+    if (se > 4) {
+      index = 1.67;
+      tag = "premium";
+    }
+
+    if (se > 6 || r.mbs > 65) {
+      index = 1.74;
+      tag = "top";
+    }
+
+    // 👉 altezza montatura
+   if (params.height > 0 && params.height < 16) {
+  design = "Progressivo corto";
+  index = 1.67; // 🔥 allineato
+  tag = "premium";
+  upgradeReason = "montatura bassa";
+}
+
+if (params.height >= 18) {
+  design = "Progressivo comfort";
+  index = 1.74; // 🔥 allineato
+  tag = "top";
+}
+
+    return { index, design, tag, upgradeReason };
+  }
+
+  // 🟢 MONOFOCALE (logica attuale migliorata)
+
+  if (se > 2) {
+    index = 1.6;
+    design = "Asferico";
+    tag = "consigliata";
+  }
+
+  if (se > 4) {
+    index = 1.67;
+    design = "Atorico";
+    tag = "premium";
+  }
+
+  if (se > 6 || r.mbs > 65) {
+    index = 1.74;
+    design = "Freeform";
+    tag = "top";
+  }
+
+  // astigmatismo
+  if (maxCyl >= 1.5 && design === "Standard") {
+    design = "Asferico";
+    tag = "consigliata";
+    upgradeReason = "astigmatismo";
+  }
+
+  if (maxCyl >= 2.5) {
+    design = "Atorico";
+    tag = "premium";
+    upgradeReason = "astigmatismo elevato";
+  }
+
+  if (maxCyl >= 3.5) {
+    design = "Freeform";
+    tag = "top";
+    upgradeReason = "astigmatismo molto elevato";
+  }
+
+  return { index, design, tag, upgradeReason };
 }
 
 </script>
