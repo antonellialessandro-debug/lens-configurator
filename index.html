@@ -194,6 +194,7 @@ button {
 </div>
 
 <button onclick="calcola()">Calcola</button>
+<button onclick="generaReferto()">Genera Referto</button>
 
 <div id="result"></div>
 
@@ -301,6 +302,79 @@ window.onload = () => {
 function val(id){
   const v=parseFloat(document.getElementById(id).value);
   return isNaN(v)?0:v;
+}
+
+function generaReferto(){
+
+  const opt = options[currentIndex];
+
+  const r = lensEngine({
+    ...lastParams,
+    forcedIndex: opt.index,
+    forcedDesign: opt.design
+  });
+
+  const diagnosi = generaDiagnosi(lastParams, r);
+
+  const win = window.open("", "_blank");
+
+  win.document.write(`
+    <html>
+    <head>
+      <title>Referto Visivo</title>
+      <style>
+        body {
+          font-family: Arial;
+          padding: 30px;
+          color: #333;
+        }
+        h1 {
+          border-bottom: 2px solid #1976d2;
+          padding-bottom: 5px;
+        }
+        .section {
+          margin-top: 20px;
+        }
+        .box {
+          background:#f5f5f5;
+          padding:10px;
+          border-radius:8px;
+        }
+      </style>
+    </head>
+    <body>
+
+      <h1>Referto Visivo</h1>
+
+      <div class="section">
+        <b>Prescrizione</b><br>
+        OD: ${lastParams.od_sph} / ${lastParams.od_cyl}<br>
+        OS: ${lastParams.os_sph} / ${lastParams.os_cyl}
+      </div>
+
+      <div class="section box">
+        ${diagnosi}
+      </div>
+
+      <div class="section">
+        <b>Lente consigliata</b><br>
+        ${opt.design} ${opt.index}
+      </div>
+
+      <div class="section">
+        <b>Dati tecnici</b><br>
+        SE: ${r.se}<br>
+        Diametro: ${r.mbs} mm<br>
+        Spessore: ${r.edgeThickness} mm
+      </div>
+
+      <br><br>
+      <button onclick="window.print()">Stampa</button>
+
+    </body>
+    </html>
+  `);
+
 }
 
 function generaOpzioni(){
