@@ -137,7 +137,7 @@ button {
 
 <div class="container">
 
-<h2>Configuratore Lenti v2.5</h2>
+<h2>Configuratore Lenti v2.6-2</h2>
 
 <div class="card">
 <h3>Prescrizione</h3>
@@ -302,6 +302,126 @@ window.onload = () => {
 function val(id){
   const v=parseFloat(document.getElementById(id).value);
   return isNaN(v)?0:v;
+}
+
+function scegliLenteMigliore_v2(params, r) {
+
+  const se = Math.abs(r.se);
+
+  const cylOD = Math.abs(params.od_cyl);
+  const cylOS = Math.abs(params.os_cyl);
+  const maxCyl = Math.max(cylOD, cylOS);
+
+  let score = 0;
+  let reasons = [];
+
+  let index = 1.5;
+  let design = "Standard";
+  let tag = "economica";
+
+  // 🔹 DIOPTRIA
+  if (se > 2) {
+    score += 1;
+    reasons.push("gradazione media");
+  }
+
+  if (se > 4) {
+    score += 2;
+    reasons.push("gradazione elevata");
+  }
+
+  if (se > 6) {
+    score += 3;
+    reasons.push("gradazione molto elevata");
+  }
+
+  // 🔹 DIAMETRO
+  if (r.mbs > 60) {
+    score += 1;
+    reasons.push("diametro ampio");
+  }
+
+  if (r.mbs > 65) {
+    score += 2;
+    reasons.push("diametro molto ampio");
+  }
+
+  // 🔹 ASTIGMATISMO
+  if (maxCyl >= 1.5) {
+    score += 1;
+    reasons.push("astigmatismo");
+  }
+
+  if (maxCyl >= 2.5) {
+    score += 2;
+    reasons.push("astigmatismo elevato");
+  }
+
+  // 🔹 MULTIFOCALE
+  if (params.isProgressive) {
+    score += 2;
+    reasons.push("visione multifocale");
+  }
+
+  // 🔹 ALTEZZA MONTATURA
+  if (params.height > 0 && params.height < 16) {
+    score += 2;
+    reasons.push("montatura bassa");
+  }
+
+  if (params.height > 22) {
+    score -= 1;
+    reasons.push("altezza ampia");
+  }
+
+  // 🎯 DECISIONE FINALE
+
+  if (score <= 1) {
+    index = 1.5;
+    design = "Standard";
+    tag = "economica";
+  }
+
+  if (score >= 2 && score <= 3) {
+    index = 1.6;
+    design = params.isProgressive ? "Progressivo" : "Asferico";
+    tag = "consigliata";
+  }
+
+  if (score >= 4 && score <= 5) {
+    index = 1.67;
+    design = params.isProgressive ? "Progressivo corto" : "Atorico";
+    tag = "premium";
+  }
+
+  if (score >= 6) {
+    index = 1.74;
+    design = params.isProgressive ? "Progressivo comfort" : "Freeform";
+    tag = "top";
+  }
+
+  // 🔥 OVERRIDE CRITICI (REAL LIFE)
+
+  // 👉 altezza troppo bassa
+  if (params.isProgressive && params.height > 0 && params.height < 12) {
+    design = "Progressivo corto";
+    index = 1.67;
+    tag = "premium";
+    reasons.push("altezza critica");
+  }
+
+  // 👉 astigmatismo molto alto
+  if (!params.isProgressive && maxCyl >= 3.5) {
+    design = "Freeform";
+    index = 1.74;
+    tag = "top";
+    reasons.push("astigmatismo molto elevato");
+  }
+
+  // 🧠 MOTIVO FINALE
+  const upgradeReason = reasons.join(", ");
+
+  return { index, design, tag, upgradeReason, score };
 }
 
 function generaReferto(){
@@ -641,7 +761,7 @@ function calcola(){
 
   const baseResult = lensEngine(lastParams);
 
-  const best = scegliLenteMigliore(lastParams, baseResult);
+  const best = scegliLenteMigliore_v2(lastParams, baseResult);
 
   window.bestReason = best.upgradeReason;
 
